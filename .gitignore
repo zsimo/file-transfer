@@ -1,0 +1,13 @@
+# FOLDERS
+node_modules/
+.idea/
+.vscode/
+files/
+
+# FILES
+.env
+*.log
+*.sqlite
+npm-debug.*
+debug.*
+dump.*
