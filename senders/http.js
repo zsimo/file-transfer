@@ -17,6 +17,8 @@ var r = request.post(url, {
         "Content-Length": fileLength,
         "content-disposition": "attachment; filename=" + path.basename(file)
     }
+}, function (reserr, response, body) {
+    console.log("response:", response.statusCode, body);
 });
 
 // see https://gist.github.com/moeiscool/2d41335b7a87f8f273e2ea219519c09c
@@ -28,9 +30,9 @@ var upload_progress = 0;
 upload.on("data", function (chunk) {
     upload_progress += chunk.length
     var percent = Math.round((upload_progress / fileLength) * 100) + "%";
-    console.log(upload_progress, percent);
+    console.log("sending: " + percent);
 })
 
 upload.on("end", function (res) {
-    console.log('Finished in ' + (Date.now() - start) + "ms");
+    console.log('sending terminated in ' + (Date.now() - start) + "ms");
 })
