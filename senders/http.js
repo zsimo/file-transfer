@@ -3,6 +3,8 @@
 var path = require("path");
 var request = require('request');
 var fs = require("fs");
+var filesDir =  path.resolve(process.cwd(), "receivers", "files");
+fs.mkdirSync(filesDir, {recursive: true});
 var start = Date.now();
 
 var url = "http://localhost:4001/file";
@@ -10,7 +12,7 @@ var r = request.post(url);
 // See http://nodejs.org/api/stream.html#stream_new_stream_readable_options
 // for more information about the highWaterMark
 // Basically, this will make the stream emit smaller chunks of data (ie. more precise upload state)
-var upload = fs.createReadStream(path.resolve(process.cwd(), "senders", "files", "valery.zip"));
+var upload = fs.createReadStream(path.resolve(process.cwd(), "senders", "files", "video.mp4"));
 
 upload.pipe(r);
 

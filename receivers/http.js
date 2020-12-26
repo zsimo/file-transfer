@@ -15,8 +15,11 @@ fastify.addContentTypeParser('*', function (req, done) {
 })
 
 fastify.post('/file', function (request, reply) {
-    var writer = fs.createWriteStream(path.resolve(filesDir, "valery.zip"));
+
     console.log(request.headers)
+
+    var contentType = request.headers["content-type"];
+    var writer = fs.createWriteStream(path.resolve(filesDir, "file." + contentType.split("/")[1]));
     request.raw.pipe(writer);
     writer.on("finish", function () {
         console.log("writer finish")
