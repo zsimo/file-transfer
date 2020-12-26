@@ -1,25 +1,34 @@
 "use strict";
 
 var path = require("path");
-var request = require('request');
+var request = require("request");
+var config = require(path.resolve(process.cwd(), "config"));
 var fs = require("fs");
 var filesDir =  path.resolve(process.cwd(), "receivers", "files");
 fs.mkdirSync(filesDir, {recursive: true});
 var start = Date.now();
 
-var url = "http://localhost:4001/file";
-var r = request.post(url);
-// See http://nodejs.org/api/stream.html#stream_new_stream_readable_options
-// for more information about the highWaterMark
-// Basically, this will make the stream emit smaller chunks of data (ie. more precise upload state)
-var upload = fs.createReadStream(path.resolve(process.cwd(), "senders", "files", "video.mp4"));
+var url = config.RECEIVER_URL;
+var file = path.resolve(process.cwd(), "senders", "files", "video.webm");
+var fileLength = fs.statSync(file).size;
+
+var r = request.post(url, {
+    headers: {
+        "Content-Length": fileLength,
+        "content-disposition": "attachment; filename=" + path.basename(file)
+    }
+});
+
+// see https://gist.github.com/moeiscool/2d41335b7a87f8f273e2ea219519c09c
+var upload = fs.createReadStream(file);
 
 upload.pipe(r);
 
 var upload_progress = 0;
 upload.on("data", function (chunk) {
     upload_progress += chunk.length
-    console.log(new Date(), upload_progress);
+    var percent = Math.round((upload_progress / fileLength) * 100) + "%";
+    console.log(upload_progress, percent);
 })
 
 upload.on("end", function (res) {
