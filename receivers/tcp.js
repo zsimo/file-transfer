@@ -4,7 +4,7 @@ var path = require("path");
 var fs = require("fs");
 var net = require('net');
 var config = require(path.resolve(process.cwd(), "config"));
-var common = require(path.resolve(process.cwd(), "senders", "common"));
+var common = require(path.resolve(process.cwd(), "receivers", "common"));
 var filesDir = common.createOutputDir();;
 var fileName = "file.mp4";
 fs.mkdirSync(filesDir, {recursive: true});
