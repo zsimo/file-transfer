@@ -15,7 +15,7 @@ var reader = fs.createReadStream(file);
 
 var client = new net.Socket();
 client.connect(config.TCP_RECEIVER_PORT, config.TCP_RECEIVER_HOST, function() {
-	console.log(`Connected to ${config.TCP_RECEIVER_HOST}:${config.TCP_RECEIVER_PORT}`);
+    console.log(`Connected to ${config.TCP_RECEIVER_HOST}:${config.TCP_RECEIVER_PORT}`);
 });
 client.on('close', function() {
     console.log('Connection closed');
