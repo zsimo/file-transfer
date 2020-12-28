@@ -2,18 +2,14 @@
 
 var path = require("path");
 var fs = require("fs");
-var filesDir =  path.resolve(process.cwd(), "receivers", "files");
-fs.mkdirSync(filesDir, {recursive: true});
+var config = require(path.resolve(process.cwd(), "config"));
+var common = require(path.resolve(process.cwd(), "senders", "common"));
+var url = new URL(config.HTTP_RECEIVER_URL);
+var filesDir = common.createOutputDir();
 
+var fastify = require("fastify")();
 
-// Require the framework and instantiate it
-var fastify = require('fastify')();
-
-
-// fastify.addContentTypeParser('*', function (req, done) {
-//     done()
-// })
-fastify.addContentTypeParser(['*'], function (request, payload, done) {
+fastify.addContentTypeParser(["*"], function (request, payload, done) {
     done();
 });
 
@@ -21,8 +17,7 @@ fastify.addContentTypeParser(['*'], function (request, payload, done) {
 // see https://nodesource.com/blog/understanding-streams-in-nodejs/
 fastify.post('/file', function (request, reply) {
 
-    console.log(request.headers)
-;
+    console.log(request.headers);
     var totalLength = parseInt(request.headers["content-length"], 10);
     var fileName = request.headers["content-disposition"].split(";")[1].split("=")[1];
     var writer = fs.createWriteStream(path.resolve(filesDir, fileName));
@@ -33,7 +28,7 @@ fastify.post('/file', function (request, reply) {
     readableStream.on("data", function (chunk) {
         downloaded += chunk.length;
         var percent = Math.round((downloaded / totalLength) * 100) + "%";
-        console.log(`receiving ${fileName} ${percent}`);
+        console.log(`receiving ${fileName} ${percent}, ${(downloaded / (1024 * 1024)).toFixed(2)}mb\``);
     });
     writer.on("finish", function () {
         console.log("writer finish")
@@ -47,7 +42,7 @@ fastify.post('/file', function (request, reply) {
 })
 
 // Run the server!
-fastify.listen(4001, "0.0.0.0", function (err, address) {
+fastify.listen(url.port, "0.0.0.0", function (err, address) {
     if (err) {
         fastify.log.error(err)
         process.exit(1)
