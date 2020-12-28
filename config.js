@@ -3,7 +3,9 @@
 var envToConfig = require("env-to-config");
 var config = envToConfig({
     mandatory_keys: [
-        "RECEIVER_URL"
+        "HTTP_RECEIVER_URL",
+        "TCP_RECEIVER_HOST",
+        "TCP_RECEIVER_PORT"
     ]
 });
 

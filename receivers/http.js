@@ -3,7 +3,7 @@
 var path = require("path");
 var fs = require("fs");
 var config = require(path.resolve(process.cwd(), "config"));
-var common = require(path.resolve(process.cwd(), "senders", "common"));
+var common = require(path.resolve(process.cwd(), "receivers", "common"));
 var url = new URL(config.HTTP_RECEIVER_URL);
 var filesDir = common.createOutputDir();
 
