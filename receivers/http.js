@@ -10,35 +10,44 @@ fs.mkdirSync(filesDir, {recursive: true});
 var fastify = require('fastify')();
 
 
-fastify.addContentTypeParser('*', function (req, done) {
-    done()
-})
+// fastify.addContentTypeParser('*', function (req, done) {
+//     done()
+// })
+fastify.addContentTypeParser(['*'], function (request, payload, done) {
+    done();
+});
 
+// in a Node.js based HTTP server, request is a readable stream and response is a writable stream.
+// see https://nodesource.com/blog/understanding-streams-in-nodejs/
 fastify.post('/file', function (request, reply) {
 
     console.log(request.headers)
+;
+    var totalLength = parseInt(request.headers["content-length"], 10);
+    var fileName = request.headers["content-disposition"].split(";")[1].split("=")[1];
+    var writer = fs.createWriteStream(path.resolve(filesDir, fileName));
 
-    var contentType = request.headers["content-type"];
-    var writer = fs.createWriteStream(path.resolve(filesDir, "file." + contentType.split("/")[1]));
-    request.raw.pipe(writer);
+    var downloaded = 0;
+    var start = Date.now();
+    var readableStream = request.raw;
+    readableStream.on("data", function (chunk) {
+        downloaded += chunk.length;
+        var percent = Math.round((downloaded / totalLength) * 100) + "%";
+        console.log(`receiving ${fileName} ${percent}`);
+    });
     writer.on("finish", function () {
         console.log("writer finish")
+        console.log(`receiving ${fileName} terminated in ${Date.now() - start}ms`);
         reply.send({
             status: "ok"
         })
     });
+    readableStream.pipe(writer);
 
 })
-fastify.get('/file', function (request, reply) {
-    // request.req.pipe(fs.createWriteStream(path.resolve(filesDir, "valery.zip")));
-    reply.send({
-        status: "ok"
-    })
-})
-
 
 // Run the server!
-fastify.listen(4001, function (err, address) {
+fastify.listen(4001, "0.0.0.0", function (err, address) {
     if (err) {
         fastify.log.error(err)
         process.exit(1)
