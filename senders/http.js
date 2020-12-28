@@ -9,30 +9,31 @@ fs.mkdirSync(filesDir, {recursive: true});
 var start = Date.now();
 
 var url = config.RECEIVER_URL;
-var file = path.resolve(process.cwd(), "senders", "files", "video.webm");
+var file = path.resolve(process.cwd(), "senders", "files", "video01.mp4");
 var fileLength = fs.statSync(file).size;
+var fileName =  path.basename(file);
 
 var r = request.post(url, {
     headers: {
         "Content-Length": fileLength,
-        "content-disposition": "attachment; filename=" + path.basename(file)
+        "content-disposition": "attachment; filename=" + fileName
     }
 }, function (reserr, response, body) {
     console.log("response:", response.statusCode, body);
 });
 
 // see https://gist.github.com/moeiscool/2d41335b7a87f8f273e2ea219519c09c
-var upload = fs.createReadStream(file);
+var reader = fs.createReadStream(file);
 
-upload.pipe(r);
+reader.pipe(r);
 
 var upload_progress = 0;
-upload.on("data", function (chunk) {
+reader.on("data", function (chunk) {
     upload_progress += chunk.length
     var percent = Math.round((upload_progress / fileLength) * 100) + "%";
-    console.log("sending: " + percent);
+    console.log(`sending ${fileName} ${percent}`);
 })
 
-upload.on("end", function (res) {
-    console.log('sending terminated in ' + (Date.now() - start) + "ms");
+reader.on("end", function (res) {
+    console.log(`sending ${fileName} terminated in ${Date.now() - start}ms`);
 })
