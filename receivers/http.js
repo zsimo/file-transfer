@@ -28,7 +28,7 @@ fastify.post('/file', function (request, reply) {
     readableStream.on("data", function (chunk) {
         downloaded += chunk.length;
         var percent = Math.round((downloaded / totalLength) * 100) + "%";
-        console.log(`receiving ${fileName} ${percent}, ${(downloaded / (1024 * 1024)).toFixed(2)}mb\``);
+        console.log(`receiving ${fileName} ${percent}, ${(downloaded / (1024 * 1024)).toFixed(2)}mb`);
     });
     writer.on("finish", function () {
         console.log("writer finish")
