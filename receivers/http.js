@@ -44,8 +44,8 @@ fastify.post('/file', function (request, reply) {
 // Run the server!
 fastify.listen(url.port, "0.0.0.0", function (err, address) {
     if (err) {
-        fastify.log.error(err)
+        console.log(err)
         process.exit(1)
     }
-    fastify.log.info(`server listening on ${address}`)
+    console.log(`server listening on ${address}`)
 })
